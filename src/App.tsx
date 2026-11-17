@@ -223,3 +223,36 @@ export default function App() {
     </ErrorBoundary>
   );
 }
+const acceptFriendRequest = async (requestId: string) => {
+  if (!firebaseUser) throw new Error('Not signed in');
+  const reqRef = doc(db, 'friendRequests', requestId);
+  try {
+    await updateDoc(reqRef, {
+      status: 'accepted',
+      updatedAt: serverTimestamp(),
+    });
+  } catch (err) {
+    handleFirestoreError(err, OperationType.UPDATE, `friendRequests/${requestId}`);
+  }
+};
+
+const rejectFriendRequest = async (requestId: string) => {
+  if (!firebaseUser) throw new Error('Not signed in');
+  const reqRef = doc(db, 'friendRequests', requestId);
+  try {
+    await updateDoc(reqRef, {
+      status: 'rejected',
+      updatedAt: serverTimestamp(),
+    });
+  } catch (err) {
+    handleFirestoreError(err, OperationType.UPDATE, `friendRequests/${requestId}`);
+  }
+};import { FriendRequestsView } from './FriendRequestsView';
+
+// Inside the Friends sidebar tab:
+{sidebarTab === 'friends' && (
+  <div className="p-3 space-y-5">
+    <FriendRequestsView />
+    {/* Accepted Friends & Pending Sent Requests */}
+  </div>
+)}
